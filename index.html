@@ -12,42 +12,30 @@
 
 			var socket = io.connect('http://localhost:8080');
 
-			var thisUser = {
-				name: "phone" + Math.floor(Math.random()*10000000000)
-			}
-
-			// on connection to server
-			socket.on('connect', function() {
-
-				thisUser.gui = new Array()
-
-				for (var i=0;i<nx.nxObjects.length;i++) {
-					thisUser.gui.push({
-						type: nx.nxObjects[i].getName(),
-						x: nx.nxObjects[i].offset.left,
-						y: nx.nxObjects[i].offset.top,
-						width: nx.nxObjects[i].width,
-						height: nx.nxObjects[i].height,
-						oscName: nx.nxObjects[i].oscName
-					})
-					thisUser.gui[i].oscName = thisUser.gui[i].oscName.replace("/","")
-				}
-				console.log(thisUser)
-				socket.emit('adduser', thisUser);
-			});
+			
 
 
 			nx.onload = function() {
 
-				nx.sendsTo("node")
+				nx.sendsTo("js")
 
-				tilt1.sendsTo("js")
-
-				tilt1.response = function(data) {
-					data.name = thisUser.name;
-					socket.emit('tiltuser', data)
+				//transmit all events
+				//this should soon be encapsulated in a "node" transmission protocol
+				for (var key in nx.nxObjects) {
+					with (nx.nxObjects[key]) {
+						for (var oscpath in val) {
+							on(oscpath, function(data) {
+								// code that will be executed
+								console.log(canvasID, oscpath, data)
+								var msg = {
+									oscName: "/"+canvasID,
+									value: data
+								}
+								socket.emit('nx', msg)
+							})
+						}
+					}
 				} 
-			
 			}
 		
 		</script>
@@ -70,7 +58,7 @@
 			<canvas nx="dial" style="width:150px;height:150px"></canvas>
 			<canvas nx="dial" style="width:150px;height:150px"></canvas>
 
-			<canvas nx="tilt" style="width:150px;height:150px"></canvas>
+		<!--	<canvas nx="tilt" style="width:150px;height:150px"></canvas> -->
 			<canvas nx="toggle" style="width:150px;height:150px"></canvas>
 			<canvas nx="toggle" style="width:150px;height:150px"></canvas>
 			<canvas nx="toggle" style="width:150px;height:150px"></canvas>
