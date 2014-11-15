@@ -12,30 +12,8 @@
 
 			var socket = io.connect('http://localhost:8080');
 
-			
-
-
 			nx.onload = function() {
-
-				nx.sendsTo("js")
-
-				//transmit all events
-				//this should soon be encapsulated in a "node" transmission protocol
-				for (var key in nx.nxObjects) {
-					with (nx.nxObjects[key]) {
-						for (var oscpath in val) {
-							on(oscpath, function(data) {
-								// code that will be executed
-								console.log(canvasID, oscpath, data)
-								var msg = {
-									oscName: "/"+canvasID,
-									value: data
-								}
-								socket.emit('nx', msg)
-							})
-						}
-					}
-				} 
+				nx.sendsTo("node")
 			}
 		
 		</script>
